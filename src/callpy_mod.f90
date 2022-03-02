@@ -6,11 +6,11 @@ module callpy_mod
   private
 
   interface
-     function set_state_py(tag, t, nx, ny, nz) result(y) bind(c)
+     function set_state_py(tag, t, nx, ny, nz, nd) result(y) bind(c)
        use iso_c_binding
        character(c_char) :: tag
-       real(c_double) t(nx, ny, nz)
-       integer(c_int) :: nx, ny, nz
+       real(c_double) t(nx, ny, nz, nd)
+       integer(c_int) :: nx, ny, nz, nd
        integer(c_int) :: y
      end function set_state_py
 
@@ -23,9 +23,11 @@ module callpy_mod
   end interface
 
   interface set_state
+     module procedure set_state_double_4d
      module procedure set_state_double_3d
      module procedure set_state_double_2d
      module procedure set_state_double_1d
+     module procedure set_state_float_4d
      module procedure set_state_float_3d
      module procedure set_state_float_2d
      module procedure set_state_float_1d
@@ -33,9 +35,11 @@ module callpy_mod
   end interface
 
   interface get_state
+    module procedure get_state_float_4d
     module procedure get_state_float_3d
     module procedure get_state_float_2d
     module procedure get_state_float_1d
+    module procedure get_state_double_4d
     module procedure get_state_double_3d
     module procedure get_state_double_2d
     module procedure get_state_double_1d
@@ -73,7 +77,7 @@ contains
     integer :: t(:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -82,8 +86,9 @@ contains
     nx = size(tmp, 1)
     ny = -1
     nz = -1
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
   end subroutine set_state_integer_1d
 
   subroutine set_state_double_1d(tag, t)
@@ -91,7 +96,7 @@ contains
     real(8) :: t(:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -102,8 +107,9 @@ contains
     nx = size(tmp, 1)
     ny = -1
     nz = -1
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_double_1d
 
@@ -112,7 +118,7 @@ contains
     real :: t(:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -123,8 +129,9 @@ contains
     nx = size(tmp, 1)
     ny = -1
     nz = -1
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_float_1d
 
@@ -133,7 +140,7 @@ contains
     real(8) :: t(:,:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1), size(t, 2))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -144,8 +151,9 @@ contains
     nx = size(tmp, 1)
     ny = size(tmp, 2)
     nz = -1
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_double_2d
 
@@ -154,7 +162,7 @@ contains
     real :: t(:,:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1), size(t, 2))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -165,8 +173,9 @@ contains
     nx = size(tmp, 1)
     ny = size(tmp, 2)
     nz = -1
-
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    nd = -1
+    
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_float_2d
 
@@ -175,7 +184,7 @@ contains
     real(8) :: t(:,:,:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1), size(t, 2), size(t, 3))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -186,8 +195,9 @@ contains
     nx = size(tmp, 1)
     ny = size(tmp, 2)
     nz = size(tmp, 3)
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_double_3d
 
@@ -196,7 +206,7 @@ contains
     real :: t(:,:,:)
     ! work arrays
     real(c_double) :: tmp(size(t, 1), size(t, 2), size(t, 3))
-    integer(c_int) :: nx, ny, nz
+    integer(c_int) :: nx, ny, nz, nd
     character(len=256) :: tag_c
 
 
@@ -207,10 +217,55 @@ contains
     nx = size(tmp, 1)
     ny = size(tmp, 2)
     nz = size(tmp, 3)
+    nd = -1
 
-    call check(set_state_py(tag_c, tmp, nx, ny, nz))
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
 
   end subroutine set_state_float_3d
+
+  subroutine set_state_double_4d(tag, t)
+    character(len=*) :: tag
+    real(8) :: t(:,:,:,:)
+    ! work arrays
+    real(c_double) :: tmp(size(t, 1), size(t, 2), size(t, 3), size(t,4))
+    integer(c_int) :: nx, ny, nz, nd
+    character(len=256) :: tag_c
+
+
+    tag_c = trim(tag)//char(0)
+
+    tmp = t
+
+    nx = size(tmp, 1)
+    ny = size(tmp, 2)
+    nz = size(tmp, 3)
+    nd = size(tmp, 4)
+
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
+
+  end subroutine set_state_double_4d
+
+  subroutine set_state_float_4d(tag, t)
+    character(len=*) :: tag
+    real :: t(:,:,:,:)
+    ! work arrays
+    real(c_double) :: tmp(size(t, 1), size(t, 2), size(t, 3), size(t,4))
+    integer(c_int) :: nx, ny, nz, nd
+    character(len=256) :: tag_c
+
+
+    tag_c = trim(tag)//char(0)
+
+    tmp = t
+
+    nx = size(tmp, 1)
+    ny = size(tmp, 2)
+    nz = size(tmp, 3)
+    nd = size(tmp, 4)
+
+    call check(set_state_py(tag_c, tmp, nx, ny, nz, nd))
+
+  end subroutine set_state_float_4d
 
   subroutine set_state_scalar(tag, t)
     character(len=*) :: tag
@@ -232,6 +287,18 @@ contains
     call check(set_state_scalar_py(tag_c, t_))
   end subroutine set_state_scalar
 
+  subroutine get_state_double_4d(tag, t)
+    character(len=*) :: tag
+    real(8) :: t(:, :, :, :)
+    real(c_double) :: t_(size(t, 1), size(t, 2), size(t, 3), size(t,4))
+    character(len=256) :: tag_c
+  
+    integer(c_int) :: n
+    n  = size(t)
+    tag_c = trim(tag)//char(0)
+    call check(get_state_py(tag_c, t_, n))
+    t = dble(t_)
+  end subroutine get_state_double_4d
 
   subroutine get_state_double_3d(tag, t)
     character(len=*) :: tag
@@ -272,6 +339,19 @@ contains
     call check(get_state_py(tag_c, t_, n))
     t = dble(t_)
   end subroutine get_state_double_1d
+
+  subroutine get_state_float_4d(tag, t)
+    character(len=*) :: tag
+    real :: t(:, :, :, :)
+    real(c_double) :: t_(size(t, 1), size(t, 2), size(t, 3), size(t, 4))
+    character(len=256) :: tag_c
+
+    integer(c_int) :: n
+    n  = size(t)
+    tag_c = trim(tag)//char(0)
+    call check(get_state_py(tag_c, t_, n))
+    t = real(t_)
+  end subroutine get_state_float_4d
 
   subroutine get_state_float_3d(tag, t)
     character(len=*) :: tag

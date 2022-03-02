@@ -6,7 +6,7 @@ import cffi
 ffibuilder = cffi.FFI()
 
 header = """
-extern int set_state_py(char *, double *, int*, int*, int*);
+extern int set_state_py(char *, double *, int*, int*, int*, int*);
 extern int set_state_char(char *, char *);
 extern int get_state_py(char *, double *, int*);
 extern int set_state_1d(char *, double *, int*);
